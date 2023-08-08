@@ -1,5 +1,9 @@
+from decouple import config
 from fastapi import APIRouter
-#from app.api.v1.auth import router as auth_router
-
 
 router = APIRouter(prefix="")
+
+@router.get("/", tags=["root"])
+async def read_root() -> dict:
+    """Root endpoint"""
+    return {"message": "Welcome to the dressup backend!"}

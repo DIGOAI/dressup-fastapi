@@ -1,14 +1,7 @@
-from fastapi import FastAPI, Depends
-from app.api.v1 import router as api_router_v1
-from fastapi.security.api_key import APIKey
-from app.middlewares  import auth
+from backend import create_app
 
-app = FastAPI()
-app.include_router(api_router_v1)
+app = create_app()
 
-# Lockedown Route
-@app.get("/secure")
-async def info(api_key: APIKey = Depends(auth.get_api_key)):
-    return {
-        "default variable": api_key
-    }
+
+if __name__ == "__main__":
+    app.run()
