@@ -160,3 +160,20 @@ def compress_pillow_image_to_jpeg_in_memory(image: Image, quality=75):
     image.save(output_buffer, format='JPEG', quality=quality)
     output_buffer.seek(0)
     return output_buffer.getvalue()
+
+
+def parse_image(image: Union[str, Image.Image, np.ndarray]):
+    """Returns an image as PIL image"""
+    if isinstance(image, str):
+        image = base64_to_image(image)
+
+    if isinstance(image, np.ndarray):
+        image = Image.fromarray(image)
+
+    return image
+
+
+def parse_list_of_images(images: List) -> List[Image.Image]:
+    """Converts a list of images as PIL image"""
+    results = [parse_image(image) for image in images]
+    return results
