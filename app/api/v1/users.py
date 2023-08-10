@@ -1,12 +1,15 @@
 from fastapi import APIRouter, Body, Header
-from model import UserSchema, UserLoginSchema
-from app.middlewares.auth_handler import signJWT
+
 from app.middlewares import verify_api_key
+from app.middlewares.auth_handler import signJWT
+from model import UserLoginSchema, UserSchema
 
 router = APIRouter()
 users = []
 
 # helpers
+
+
 def check_user(data: UserLoginSchema):
     """Helper function definition"""
     for user in users:
@@ -20,7 +23,8 @@ def check_user(data: UserLoginSchema):
 async def create_user(user: UserSchema = Body(...), x_api_key: str = Header(...)):
     """Create user"""
     verify_api_key(x_api_key)
-    users.append(user)  # replace with db call, making sure to hash the password first
+    # replace with db call, making sure to hash the password first
+    users.append(user)
     return signJWT(user.email)
 
 

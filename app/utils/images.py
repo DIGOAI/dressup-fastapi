@@ -1,10 +1,12 @@
+import base64
 import os
 from io import BytesIO
-import base64
 from typing import List, Union
+
+import numpy as np
 import requests
 from PIL import Image, PngImagePlugin
-import numpy as np
+from PIL.Image import Image as PILImage
 
 
 def download_image_from_url(url: str):
@@ -45,7 +47,7 @@ def read_image_from_disk(filepath: str):
     return image
 
 
-def add_metadata_to_image(image: Image, parameters):
+def add_metadata_to_image(image: PILImage, parameters):
     """Add metadata `parameters` to an image on Memory."""
     # Crear el objeto pnginfo y añadir los metadatos
     pnginfo = PngImagePlugin.PngInfo()
@@ -63,7 +65,7 @@ def add_metadata_to_image(image: Image, parameters):
     return image_with_metadata
 
 
-def save_image_to_disk(image: Image, filepath: str, filename: str):
+def save_image_to_disk(image: PILImage, filepath: str, filename: str):
     """Save an image to disk."""
     if not os.path.exists(filepath):
         os.makedirs(filepath)
@@ -71,7 +73,7 @@ def save_image_to_disk(image: Image, filepath: str, filename: str):
     image.save(fullpath)
 
 
-def save_pil_image_to_disk(image: Image, filepath: str):
+def save_pil_image_to_disk(image: PILImage, filepath: str):
     """Saves a PIL image to disk."""
     image.save(filepath)
 
@@ -137,7 +139,7 @@ def array_of_images_to_base64(images: list):
     return results
 
 
-def image_to_bytes(image: Image):
+def image_to_bytes(image: PILImage):
     """Convert a Pillow image to bytes."""
     image_bytes = image.tobytes()
     return image_bytes
@@ -152,7 +154,7 @@ def array_of_images_to_bytes(images: list):
     return results
 
 
-def compress_pillow_image_to_jpeg_in_memory(image: Image, quality=75):
+def compress_pillow_image_to_jpeg_in_memory(image: PILImage, quality=75):
     """Compress a Pillow image to JPEG"""
     if image.mode == 'RGBA':
         image = image.convert('RGB')
