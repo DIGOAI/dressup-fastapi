@@ -9,7 +9,6 @@ Config.load_config()
 
 
 def create_app() -> FastAPI:
-    print(Config.X_API_KEY)
     app = FastAPI()
     app.include_router(api_v1_router)
     app.include_router(api_orders_router)
