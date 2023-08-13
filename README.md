@@ -35,6 +35,8 @@ git commit -m "init supabase"
 npx supabase start
 ```
 
+With the `supabse start` command, a docker container is up and present the Supabase UI in [`localhost:54323`](http://localhost:54323)
+
 ## Create a new migration
 
 ```shell
