@@ -56,6 +56,14 @@ Apply the new migration to your local database:
 npx supabase db reset
 ```
 
+Push the migration to remote project:
+
+```shell
+npx supabase db push
+```
+
+> **DANGER:** The migration will be applied to the database in the remote project, make sure to test the changes in a _test environment_ beforehand.
+
 # Last docs
 
 This docs is in deprecated status.
