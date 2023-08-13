@@ -9,10 +9,12 @@ class Config:
     X_API_KEY: str
     JWT_SECRET: str
     JWT_ALGORITHM: str
+    DEBUG: bool
 
     @classmethod
     def load_config(cls):
-        load_dotenv()
+        if os.getenv("ENV") == "dev":
+            load_dotenv()
 
         cls.SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
         cls.SUPABASE_KEY: str = os.getenv("SUPABASE_KEY", "")
@@ -20,3 +22,4 @@ class Config:
         cls.X_API_KEY: str = os.getenv("X_API_KEY", "")
         cls.JWT_SECRET = os.getenv("JWT_SECRET", "")
         cls.JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+        cls.DEBUG = os.getenv("DEBUG", "False") == "True"
