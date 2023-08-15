@@ -30,6 +30,7 @@ class JWTBearer(HTTPBearer):
             payload = decodeJWT(jwtoken)
         except:
             payload = None
+
         if payload:
             isTokenValid = True
         return isTokenValid
