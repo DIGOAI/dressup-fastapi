@@ -66,6 +66,16 @@ npx supabase db push
 
 > **DANGER:** The migration will be applied to the database in the remote project, make sure to test the changes in a _test environment_ beforehand.
 
+# FastAPI dev
+
+## Run the development server
+
+```shell
+$Env:ENV = "dev"; uvicorn main:app --reload
+```
+
+> In **Windows** use `$Env:<variable-name> = "<new-value>"` for set a new enviroment variable with value.
+
 # Last docs
 
 This docs is in deprecated status.
