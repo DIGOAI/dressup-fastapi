@@ -1,5 +1,5 @@
 -- ========================= CREATE Key Type TYPE =============================
-CREATE TYPE keyType AS ENUM ('PUBLIC', 'PRIVATE', 'ADMIN');
+CREATE TYPE keyType AS ENUM ('PUBLIC', 'PRIVATE');
 
 -- ========================= CREATE Key Status TYPE =============================
 CREATE TYPE keyStatus AS ENUM ('ACTIVE', 'EXPIRED', 'DELETED');
