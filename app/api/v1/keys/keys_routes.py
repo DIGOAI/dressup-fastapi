@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Body, HTTPException
 from pydantic import UUID4
 from typing_extensions import TypedDict
@@ -27,13 +29,17 @@ def get_keys(user_id: UUID4):
 def new_key(key: KeyInsert = Body(...)) -> NewKey:
     print(key)
 
-    token = signJWT(key.user_id, key.type, int(
-        key.exp.timestamp()))["access_token"]
+    token, payload = signJWT(key.user_id, key.type, "USER", key.exp_in)
+
+    exp = datetime.fromtimestamp(payload["exp"])
+    iat = datetime.fromtimestamp(payload["iat"])
 
     try:
         res = supabase.table("keys").insert(json={
-            **key.model_dump(),
+            **key.model_dump(exclude={"exp_in"}),
+            "exp": exp.isoformat(sep='T', timespec='seconds'),
             "key": token,
+            "created_at": iat.isoformat(sep='T', timespec='seconds'),
         }).execute()
 
         new_key = Key(**res.data[0])

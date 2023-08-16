@@ -8,7 +8,6 @@ from pydantic import BaseModel, ConfigDict, Field, field_serializer
 class KeyType(str, Enum):
     PUBLIC = "PUBLIC"
     PRIVATE = "PRIVATE"
-    ADMIN = "ADMIN"
 
 
 class KeyStatus(str, Enum):
@@ -23,23 +22,20 @@ class KeyBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=120)
     user_id: str = Field(...)
     type: KeyType = Field(...)
-    exp: datetime = Field(...)
-
-    @field_serializer('exp')
-    def serialize_exp(v, _info):
-        return v.isoformat(sep='T', timespec='seconds')  # type: ignore
 
 
 class KeyInsert(KeyBase):
     status: Optional[KeyStatus] = Field(default=KeyStatus.ACTIVE)
+    exp_in: int = Field(default=0, gt=30)
 
 
 class Key(KeyBase):
     id: int = Field(...)
+    exp: datetime = Field(...)
     status: KeyStatus = Field(...)
     key: str = Field(...)
     created_at: datetime = Field(...)
 
-    @field_serializer('created_at')
-    def serialize_exp(v, _info):
+    @field_serializer('exp', 'created_at')
+    def serialize_datetime(v, _info):
         return v.isoformat(sep='T', timespec='seconds')  # type: ignore
