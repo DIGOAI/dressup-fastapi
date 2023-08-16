@@ -3,9 +3,10 @@ from typing import Any, Union
 from PIL import Image
 
 from app.config import Config
-from app.repositories.supabase import supabase, FileOptions
+from app.repositories.supabase import FileOptions, supabase
 from app.utils.files import generate_random_filename
-from app.utils.images import compress_pillow_image_to_jpeg_in_memory, image_to_bytes
+from app.utils.images import (compress_pillow_image_to_jpeg_in_memory,
+                              image_to_bytes)
 
 EXPIRES_IN = 60 * 60 * 24 * 365 * 5
 DEFAULT_BUCKET = Config.SUPABASE_BUCKET
