@@ -1,4 +1,3 @@
-from fastapi.responses import JSONResponse
 from gotrue.errors import AuthApiError
 
 

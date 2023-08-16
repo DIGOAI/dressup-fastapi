@@ -1,11 +1,19 @@
+from enum import IntEnum
+
 from fastapi import HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.middlewares.auth_handler import decodeJWT
 
 
+class Role(IntEnum):
+    PUBLIC = 1
+    USER = 2
+    ADMIN = 3
+
+
 class JWTBearer(HTTPBearer):
-    def __init__(self, auto_error: bool = True):
+    def __init__(self, min_role: Role = Role.PUBLIC, auto_error: bool = True):
         super(JWTBearer, self).__init__(auto_error=auto_error)
 
     async def __call__(self, request: Request):
@@ -15,22 +23,26 @@ class JWTBearer(HTTPBearer):
             if not credentials.scheme == "Bearer":
                 raise HTTPException(
                     status_code=403, detail="Invalid authentication scheme.")
-            if not self.verify_jwt(credentials.credentials):
+
+            payload = self.verify_jwt(credentials.credentials)
+
+            if payload is None:
                 raise HTTPException(
                     status_code=403, detail="Invalid token or expired token.")
-            return credentials.credentials
+
+            request.state.user = payload["sub"]
+            request.state.role = payload["role"]
+
+            return {"user": payload["sub"], "role": payload["role"]}
         else:
             raise HTTPException(
                 status_code=403, detail="Invalid authorization code.")
 
-    def verify_jwt(self, jwtoken: str) -> bool:
-        isTokenValid: bool = False
-
+    def verify_jwt(self, jwtoken: str):
         try:
-            payload = decodeJWT(jwtoken)
+            return decodeJWT(jwtoken)
         except:
-            payload = None
+            return None
 
-        if payload:
-            isTokenValid = True
-        return isTokenValid
+    def verify_role(self, role: str, min_role: str):
+        return Role[role] >= Role[min_role]

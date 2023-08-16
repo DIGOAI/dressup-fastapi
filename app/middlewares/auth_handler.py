@@ -1,34 +1,40 @@
 import time
-from typing import Any
+from typing import cast
 
 import jwt
 from typing_extensions import TypedDict
 
 from app.config import Config
 
+Payload = TypedDict('Payload', {
+    'sub': str,
+    'type': str,
+    'role': str,
+    'exp': int,
+    'iat': int
+})
 
-TokenResponse = TypedDict(
-    'TokenResponse', {"access_token": str})
 
-
-def signJWT(user_id: str, apiType: str, exp_time_sec: int) -> TokenResponse:
+def signJWT(user_id: str, keyType: str, role: str, exp_time_sec: int):
     # exp and iat in seconds since epoch (UTC) - https://www.rfc-editor.org/rfc/rfc7519#section-2
-    payload = {
+    payload: Payload = {
         "sub": user_id,
-        "type": apiType,
+        "type": keyType,
+        "role": role,
         "exp": int(time.time()) + exp_time_sec,
         "iat": int(time.time())
     }
-    token = jwt.encode(payload, Config.JWT_SECRET,
+    token = jwt.encode(dict(payload), Config.JWT_SECRET,
                        algorithm=Config.JWT_ALGORITHM)
 
-    return {"access_token": token}
+    return token, payload
 
 
-def decodeJWT(token: str) -> dict[str, Any] | None:
+def decodeJWT(token: str) -> Payload | None:
     try:
-        decoded_token = jwt.decode(
-            token, Config.JWT_SECRET, algorithms=[Config.JWT_ALGORITHM], options={"require": ["exp", "iss", "sub"]})
-        return decoded_token if decoded_token["exp"] >= time.time() else None
+        decoded_token = cast(Payload, jwt.decode(
+            token, Config.JWT_SECRET, algorithms=[Config.JWT_ALGORITHM], options={"require": ["exp", "iat", "sub"]}))
+        print(decoded_token)
+        return decoded_token
     except:
-        return {}
+        return None
