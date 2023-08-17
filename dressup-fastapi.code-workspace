@@ -1,17 +1,22 @@
 {
   "folders": [
     {
-      "name": "project-root",
+      "name": "DressUp - root",
       "path": "./"
     },
     {
-      "name": "supabase-functions",
+      "name": "Supabase Functions",
       "path": "supabase/functions"
+    },
+    {
+      "name": "Supabase Migrations",
+      "path": "supabase/migrations"
     }
   ],
   "settings": {
     "files.exclude": {
-      "supabase/functions/": true
+      "supabase/functions/": true,
+      "supabase/migrations/": true
     }
   }
 }
