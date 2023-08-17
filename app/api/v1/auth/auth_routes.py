@@ -1,11 +1,11 @@
 from typing import cast
 
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, HTTPException, status
 from pydantic import UUID4
 from typing_extensions import TypedDict
 
 from app.api.v1.auth.auth_exeptions import AuthApiError, SupabaseException
-from app.api.v1.auth.auth_schema import LoginSchema, RegisterSchema
+from app.api.v1.auth.auth_schema import LoginSchema, Profile, RegisterSchema
 from app.middlewares.auth_handler import signJWT
 from app.repositories.supabase import supabase
 
@@ -24,8 +24,16 @@ def login(signin: LoginSchema = Body(...)) -> LoginResponse:
         access_token_supabase = res.session.access_token if res.session is not None else ""
         user_id = res.user.id if res.user is not None else ""
 
+        res = supabase.table("profiles").select(
+            "*").eq("id", user_id).single().execute()
+        user = Profile(**res.data)
+
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
         access_token, _ = signJWT(user_id, keyType="PUBLIC",
-                                  role="ADMIN", exp_time_sec=3600)
+                                  role=user.role, exp_time_sec=3600)
 
         return {"user": user_id, "access_token_supabase": access_token_supabase, "access_token_dressup": access_token}
     except Exception as e:
