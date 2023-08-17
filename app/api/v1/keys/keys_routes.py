@@ -4,9 +4,9 @@ from fastapi import APIRouter, Body, HTTPException
 from pydantic import UUID4
 from typing_extensions import TypedDict
 
-from app.api.v1.keys.keys_schemas import Key, KeyInsert
-from app.middlewares.auth_handler import signJWT
-from app.repositories.supabase import supabase
+from app.middlewares import signJWT
+from app.repositories import supabase
+from app.schemas import Key, KeyInsert
 
 router = APIRouter(prefix="/keys", tags=["keys"])
 

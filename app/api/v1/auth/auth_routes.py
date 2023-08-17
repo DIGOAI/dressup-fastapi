@@ -4,10 +4,10 @@ from fastapi import APIRouter, Body, HTTPException, status
 from pydantic import UUID4
 from typing_extensions import TypedDict
 
-from app.api.v1.auth.auth_exeptions import AuthApiError, SupabaseException
-from app.api.v1.auth.auth_schema import LoginSchema, Profile, RegisterSchema
-from app.middlewares.auth_handler import signJWT
-from app.repositories.supabase import supabase
+from app.exeptions import AuthApiError, SupabaseException
+from app.middlewares import signJWT
+from app.repositories import supabase
+from app.schemas import LoginSchema, Profile, RegisterSchema
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
