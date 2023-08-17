@@ -1,14 +1,14 @@
+# pydantic[email]
+dnspython==2.4.2
+email-validator==2.0.0.post2
 fastapi==0.101.0
+numpy==1.25.2
+Pillow==10.0.0
 pydantic==2.1.1
-python-dotenv==1.0.0
-uvicorn==0.23.2
 PyJWT==2.8.0
+python-dotenv==1.0.0
+python-multipart==0.0.6
+requests==2.31.0
 SQLAlchemy==2.0.19
 supabase==1.0.4
-Pillow==10.0.0
-numpy==1.25.2
-requests==2.31.0
-
-# pydantic[email]
-email-validator==2.0.0.post2
-dnspython==2.4.2
+uvicorn==0.23.2
