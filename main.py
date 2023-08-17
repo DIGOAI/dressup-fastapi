@@ -1,8 +1,9 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from app.api.v1.auth import SupabaseException
 from app.api.v1 import router as api_v1_router
+from app.exeptions import SupabaseException
+
 # from app.api.v1.orders import router as api_orders_router
 # from app.api.v1.users import router as api_users_router
 # from app.config import Config
