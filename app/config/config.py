@@ -26,7 +26,10 @@ class SingletonMeta(type):
 class Config(metaclass=SingletonMeta):
     def __init__(self):
         if os.getenv("ENV") == "dev":
-            print("Loading .env file")
+            print("Loading DEV config")
+            load_dotenv('.env.dev')
+        else:
+            print("Loading PROD config")
             load_dotenv()
 
         self.SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
