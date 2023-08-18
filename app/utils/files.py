@@ -1,6 +1,6 @@
-from typing import Optional
 import random
 import string
+from typing import Optional
 
 
 def generate_random_filename(

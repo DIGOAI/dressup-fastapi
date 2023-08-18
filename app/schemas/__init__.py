@@ -1,18 +1,5 @@
-# build a schema using pydantic
-from pydantic import BaseModel
-
-class Book(BaseModel):
-    title: str
-    rating: int
-    author_id: int
-
-    class Config:
-        orm_mode = True
-
-class Author(BaseModel):
-    name:str
-    age:int
-
-    class Config:
-        orm_mode = True
-        
+from .auth_schemas import LoginSchema, Profile, RegisterSchema
+from .images_schemas import Image, ImageInsert, ImageKey, ImageType
+from .keys_schemas import Key, KeyInsert
+from .model_schemas import Model, ModelInsert, ModelWithImages, ModelInsertForm
+from .order_schemas import Order, OrderInsert

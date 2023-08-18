@@ -1,7 +1,11 @@
-from supabase import create_client, Client
-from app.config import config
+from storage3.types import FileOptions
+from supabase.client import Client, create_client
 
+from app.config import Config
 
-url: str = config.get("SUPABASE_URL")
-key: str = config.get("SUPABASE_KEY")
-supabase: Client = create_client(url, key)
+# Config.load_config()
+
+supabase: Client = create_client(
+    Config.SUPABASE_URL,
+    Config.SUPABASE_KEY
+)

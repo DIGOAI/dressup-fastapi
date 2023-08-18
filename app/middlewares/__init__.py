@@ -1,10 +1,13 @@
-from decouple import config
-from fastapi import APIRouter, HTTPException, Header
+from fastapi import Header, HTTPException
 
-# helper
-EXPECTED_API_KEY = config("API_KEY")
+from app.config import Config
 
-def verify_api_key(x_api_key: str = Header(...)):
-    """Main method definition"""
-    if x_api_key != EXPECTED_API_KEY:
-        raise HTTPException(status_code=401, detail="Invalid or missing X-API-KEY")
+from .auth_bearer import JWTBearer, Role
+from .auth_handler import decodeJWT, signJWT
+
+
+# def verify_api_key(x_api_key: str = Header(...)):
+#     """Main method definition"""
+#     if x_api_key != Config.X_API_KEY:
+#         raise HTTPException(
+#             status_code=401, detail="Invalid or missing X-API-KEY")
