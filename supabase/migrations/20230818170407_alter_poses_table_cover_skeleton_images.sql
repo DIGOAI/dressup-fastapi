@@ -1,0 +1,5 @@
+ALTER TABLE poses
+RENAME COLUMN image TO cover_image;
+
+ALTER TABLE poses
+ADD COLUMN skeleton_image BIGINT NOT NULL REFERENCES images (id) ON DELETE SET NULL;
