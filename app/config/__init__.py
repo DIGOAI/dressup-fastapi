@@ -1,4 +1,4 @@
-from .config import Config as _Config
+from app.config.config import Config as _Config
 
 Config = _Config()
 # class Config:

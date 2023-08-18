@@ -1,4 +1,4 @@
-from .supabase import supabase, FileOptions
+from app.repositories.supabase import FileOptions, supabase
 
 # from sqlalchemy import (JSON, Column, DateTime, Float, ForeignKey, Integer,
 #                         String, Table)

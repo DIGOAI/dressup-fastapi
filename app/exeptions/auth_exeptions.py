@@ -1,4 +1,5 @@
 from gotrue.errors import AuthApiError
+from storage3.utils import StorageException
 
 
 class SupabaseException(Exception):
