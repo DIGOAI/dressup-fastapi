@@ -1,1 +1,1 @@
-from .auth_exeptions import AuthApiError, SupabaseException
+from app.exeptions.auth_exeptions import AuthApiError, SupabaseException
