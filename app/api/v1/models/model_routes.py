@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, Body, Depends, Form, Request, UploadFile
+from fastapi import APIRouter, Depends, Form, Request, UploadFile
 from pydantic import HttpUrl
 from typing_extensions import TypedDict
 
@@ -30,13 +30,6 @@ def get_models(request: Request) -> DataResponse:
 
 
 @router.post("/new", dependencies=[Depends(JWTBearer(Role.ADMIN))])
-def create_model(model: ModelInsert = Body(...)):
-    return supabase.table("models").insert(json={
-        **model.model_dump(),
-    }).execute()
-
-
-@router.post("/new/images", dependencies=[Depends(JWTBearer(Role.ADMIN))])
 def create_model_with_images(images: list[UploadFile], name: str = Form(), tensor_file_url: Optional[HttpUrl] = Form(None)) -> ModelWithImagesResponse:
     model = ModelInsert(name=name, tensor_file_url=tensor_file_url)
 
