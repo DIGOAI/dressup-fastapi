@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field, field_serializer
 
 from app.schemas.model_schemas import ModelWithImages
 from app.schemas.pose_schemas import PoseSetWithPoses
+from app.schemas.images_schemas import ImageInsert
 from app.utils.patterns import UUIDV4_PATTERN
 
 
@@ -37,6 +38,19 @@ class OrderBase(BaseModel):
 
 class OrderInsert(OrderBase):
     status: Optional[OrderStatus] = Field(default=OrderStatus.WAITING)
+    name: Optional[str] = Field(min_length=3, max_length=255)
+
+
+class OrderUpdateStatus(BaseModel):
+    status: OrderStatus = Field(default=OrderStatus.COMPLETED)
+    process_id: Optional[str] = Field(max_length=100)
+
+
+class OrderComplete(BaseModel):
+    order_id: int = Field(gt=0)
+    metadata: Optional[Dict[str, Any]] = Field(default={})
+    images: list[ImageInsert] = Field(...)
+    status: OrderItemStatus = Field(...)
 
 
 class Order(OrderBase):
@@ -44,6 +58,8 @@ class Order(OrderBase):
     user_id: str = Field(pattern=UUIDV4_PATTERN)
     status: OrderStatus = Field(...)
     created_at: datetime = Field(...)
+    name: Optional[str] = Field(...)
+    process_id: Optional[str] = Field(...)
 
     @field_serializer('created_at')
     def serialize_datetime(v, _info):

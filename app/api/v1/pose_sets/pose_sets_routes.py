@@ -5,7 +5,7 @@ from app.repositories import supabase
 from app.schemas import PoseSet, PoseSetInsert, PoseSetWithPoses
 
 router = APIRouter(
-    prefix="/pose_sets", tags=["pose sets"], dependencies=[Depends(JWTBearer())])
+    prefix="/pose_sets", tags=["Pose sets"], dependencies=[Depends(JWTBearer())])
 
 
 @router.get("/")

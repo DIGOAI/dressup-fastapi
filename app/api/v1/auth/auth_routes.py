@@ -9,7 +9,7 @@ from app.middlewares import signJWT
 from app.repositories import supabase
 from app.schemas import LoginSchema, Profile, RegisterSchema
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["Auth"])
 
 LoginResponse = TypedDict(
     "LoginResponse", {"user": str | UUID4, "access_token_supabase": str, "access_token_dressup": str})
@@ -32,8 +32,13 @@ def login(signin: LoginSchema = Body(...)) -> LoginResponse:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-        access_token, _ = signJWT(user_id, keyType="PUBLIC",
-                                  role=user.role, exp_time_sec=3600)
+        role = user.role
+
+        keyType = 'SERVICE' if role == 'ADMIN' else 'PUBLIC'
+        exp_time_sec = 31536000 if role == 'ADMIN' else 3600
+
+        access_token, _ = signJWT(user_id, keyType=keyType,
+                                  role=user.role, exp_time_sec=exp_time_sec)
 
         return {"user": user_id, "access_token_supabase": access_token_supabase, "access_token_dressup": access_token}
     except Exception as e:

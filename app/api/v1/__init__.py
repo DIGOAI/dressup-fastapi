@@ -11,13 +11,13 @@ from app.config import Config
 router = APIRouter(prefix="/v1")
 
 
-@router.get("/", tags=["root"])
+@router.get("/", tags=["Default"])
 def read_root():
     """Root endpoint"""
     return {"message": "Welcome to the dressup backend!"}
 
 
-@router.get("/ping", tags=["root"])
+@router.get("/ping", tags=["Default"])
 def ping():
     """Ping endpoint"""
     return {"message": "ok"}
