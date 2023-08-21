@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, RedirectResponse
 
 from app.api.v1 import router as api_v1_router
 from app.exeptions import SupabaseException
@@ -39,8 +39,12 @@ def create_app() -> FastAPI:
         allow_headers=["*"]
     )
 
+    @app.get("/")
+    def index():
+        return RedirectResponse(url="/api/v1")
+
     # Load routers
-    app.include_router(api_v1_router)
+    app.include_router(api_v1_router, prefix="/api")
     # app.include_router(api_orders_router)
     # app.include_router(api_users_router)
     return app

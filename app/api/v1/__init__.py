@@ -4,6 +4,7 @@ from app.api.v1.auth import auth_router
 from app.api.v1.keys import keys_router
 from app.api.v1.models import model_router
 from app.api.v1.orders import order_router
+from app.api.v1.pose_sets import pose_sets_router
 from app.api.v1.poses import pose_router
 from app.config import Config
 
@@ -27,3 +28,4 @@ router.include_router(keys_router)
 router.include_router(order_router)
 router.include_router(model_router)
 router.include_router(pose_router)
+router.include_router(pose_sets_router)
