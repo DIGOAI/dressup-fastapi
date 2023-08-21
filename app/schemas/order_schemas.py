@@ -39,6 +39,10 @@ class OrderInsert(OrderBase):
     status: Optional[OrderStatus] = Field(default=OrderStatus.WAITING)
 
 
+class OrderUpdateStatus(BaseModel):
+    status: OrderStatus = Field(default=OrderStatus.COMPLETED)
+
+
 class Order(OrderBase):
     id: int = Field(...)
     user_id: str = Field(pattern=UUIDV4_PATTERN)

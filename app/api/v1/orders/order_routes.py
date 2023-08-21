@@ -1,11 +1,12 @@
-from fastapi import (APIRouter, Depends, Form, HTTPException, Request,
+from fastapi import (APIRouter, Body, Depends, Form, HTTPException, Request,
                      UploadFile, status)
 from typing_extensions import TypedDict
 
 from app.common import StorageFolder, upload_images_to_storage
 from app.middlewares import JWTBearer
 from app.repositories import supabase
-from app.schemas import Image, Order, OrderInsert, OrderWithData
+from app.schemas import (Image, Order, OrderInsert, OrderUpdateStatus,
+                         OrderWithData)
 
 router = APIRouter(
     prefix="/orders", tags=["Orders"], dependencies=[Depends(JWTBearer())])
@@ -51,6 +52,33 @@ def get_order_with_data(request: Request, order_id: int) -> OrderWithDataRespons
     order = OrderWithData(**order_res.data[0])
 
     return {"data": order, "count": 1}
+
+
+@router.post("/{order_id}/update-status")
+def update_order_status(request: Request, order_id: int, new_status: OrderUpdateStatus = Body(...)) -> OrderResponse:
+    user_id = request.state.user
+    role = request.state.role
+
+    if role != "admin":
+        order_res = supabase.table("orders").select("*").eq(
+            "user_id", user_id).eq("id", order_id).execute()
+    else:
+        order_res = supabase.table("orders").select("*").eq(
+            "id", order_id).execute()
+
+    if len(order_res.data) == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Order {order_id} not found.")
+
+    order = Order(**order_res.data[0])
+
+    order_res = supabase.table("orders").update(json={
+        "status": new_status.status
+    }).eq("id", order.id).execute()
+
+    order_updated = Order(**order_res.data[0])
+
+    return {"data": order_updated, "count": 1}
 
 
 @router.post("/new")
