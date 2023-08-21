@@ -9,7 +9,7 @@ from app.middlewares import signJWT
 from app.repositories import supabase
 from app.schemas import LoginSchema, Profile, RegisterSchema
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["Auth"])
 
 LoginResponse = TypedDict(
     "LoginResponse", {"user": str | UUID4, "access_token_supabase": str, "access_token_dressup": str})

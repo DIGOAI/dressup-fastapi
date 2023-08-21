@@ -15,7 +15,7 @@ router = APIRouter(
 
 @router.get("/")
 def get_poses(request: Request):
-    res = supabase.table("poses").select("*").execute()
+    res = supabase.table("Poses").select("*").execute()
     return {"data": res.data, "count": len(res.data)}
 
 

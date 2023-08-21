@@ -39,7 +39,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"]
     )
 
-    @app.get("/")
+    @app.get("/", tags=["Default"], include_in_schema=False)
     def index():
         return RedirectResponse(url="/api/v1")
 

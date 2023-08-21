@@ -8,7 +8,7 @@ from app.middlewares import signJWT
 from app.repositories import supabase
 from app.schemas import Key, KeyInsert
 
-router = APIRouter(prefix="/keys", tags=["keys"])
+router = APIRouter(prefix="/keys", tags=["Keys"])
 
 NewKey = TypedDict("NewKey", {"data": Key})
 

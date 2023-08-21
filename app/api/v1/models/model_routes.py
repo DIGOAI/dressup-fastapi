@@ -10,7 +10,7 @@ from app.repositories import supabase
 from app.schemas import Image, Model, ModelInsert, ModelWithImages
 
 router = APIRouter(
-    prefix="/models", tags=["models"], dependencies=[Depends(JWTBearer())])
+    prefix="/models", tags=["Models"], dependencies=[Depends(JWTBearer())])
 
 DataResponse = TypedDict(
     "DataResponse", {"data": list[ModelWithImages], "count": int})

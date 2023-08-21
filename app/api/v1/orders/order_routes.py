@@ -8,7 +8,7 @@ from app.repositories import supabase
 from app.schemas import Image, Order, OrderInsert, OrderWithData
 
 router = APIRouter(
-    prefix="/orders", tags=["orders"], dependencies=[Depends(JWTBearer())])
+    prefix="/orders", tags=["Orders"], dependencies=[Depends(JWTBearer())])
 
 OrderResponse = TypedDict("OrderResponse", {"data": Order, "count": int})
 OrdersResponse = TypedDict(
