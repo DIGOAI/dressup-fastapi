@@ -1,8 +1,8 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, Field, HttpUrl, Json, field_serializer
+from pydantic import BaseModel, Field, HttpUrl, field_serializer
 
 
 class ImageType(str, Enum):
@@ -24,16 +24,16 @@ class ImageBase(BaseModel):
 
 
 class ImageInsert(ImageBase):
-    metadata: Optional[Json] = Field(examples=[{"key1": "value1"}, {"key2": "value2"}, {
-                                     "key3": "value3"}, {"key4": "value4"}, {"key5": "value5"}])
+    metadata: Optional[Dict[str, Any]] = Field(examples=[{"key1": "value1"}, {"key2": "value2"}, {
+        "key3": "value3"}, {"key4": "value4"}, {"key5": "value5"}])
     type: Optional[ImageType] = Field(
         examples=["INPUT", "OUTPUT", "MODEL", "POSE"], default=ImageType.INPUT)
 
 
 class Image(ImageBase):
     id: int = Field(...)
-    metadata: Optional[Json] = Field(examples=[{"key1": "value1"}, {"key2": "value2"}, {
-                                     "key3": "value3"}, {"key4": "value4"}, {"key5": "value5"}])
+    metadata: Optional[Dict[str, Any]] = Field(examples=[{"key1": "value1"}, {"key2": "value2"}, {
+        "key3": "value3"}, {"key4": "value4"}, {"key5": "value5"}])
     type: ImageType = Field(examples=["INPUT", "OUTPUT", "MODEL", "POSE"])
     created_at: datetime = Field(...)
 
