@@ -1,13 +1,9 @@
-from fastapi import (APIRouter, Body, Depends, Form, HTTPException, Request,
-                     UploadFile, status)
-from pydantic import HttpUrl
-from typing_extensions import TypedDict
+from fastapi import APIRouter, Depends, Form, Request, UploadFile
 
 from app.common import StorageFolder, upload_images_to_storage
-from app.config import Config
 from app.middlewares import JWTBearer, Role
 from app.repositories import supabase
-from app.schemas import Image, PoseSet, PoseSetInsert, PoseSetWithPoses
+from app.schemas import Image
 
 router = APIRouter(
     prefix="/poses", tags=["poses"], dependencies=[Depends(JWTBearer())])

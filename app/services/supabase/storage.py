@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Union
 
 from PIL import Image
 
@@ -51,7 +51,7 @@ def upload_image_to_storage(
         extension = "jpeg"
         file_bytes = compress_pillow_image_to_jpeg_in_memory(image, quality)
     else:
-        extension = image.format.lower()
+        extension = image.format.lower() if image.format else "jpeg"
         file_bytes = image_to_bytes(image)
 
     hashname = generate_random_filename(extension=None)

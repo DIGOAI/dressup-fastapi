@@ -19,36 +19,6 @@ OrdersWithDataResponse = TypedDict("OrdersWithDataResponse", {
                                    "data": list[OrderWithData], "count": int})
 
 
-# @router.get("/")
-# def get_orders(request: Request) -> OrdersResponse:
-#     user_id = request.state.user
-
-#     orders_res = supabase.table("orders").select(
-#         "*").eq("user_id", user_id).execute()
-
-#     orders = [Order(**order) for order in orders_res.data]
-
-#     return {"data": orders, "count": len(orders)}
-
-
-# @router.get("/{order_id}")
-# def get_order(request: Request, order_id: int) -> OrderResponse:
-#     user_id = request.state.user
-
-#     print("Order ID", order_id)
-
-#     order_res = supabase.table("orders").select(
-#         "*").eq("user_id", user_id).eq("id", order_id).execute()
-
-#     if len(order_res.data) == 0:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-#                             detail=f"Order {order_id} not found.")
-
-#     order = Order(**order_res.data[0])
-
-#     return {"data": order, "count": 1}
-
-
 @router.get("/")
 def get_orders_with_data(request: Request) -> OrdersWithDataResponse:
     user_id = request.state.user
