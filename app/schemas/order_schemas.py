@@ -4,6 +4,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, field_serializer
 
+from app.schemas.model_schemas import ModelWithImages
+from app.schemas.pose_schemas import PoseSetWithPoses
 from app.utils.patterns import UUIDV4_PATTERN
 
 
@@ -17,6 +19,7 @@ class OrderStatus(str, Enum):
 
 class OrderBase(BaseModel):
     model: int = Field(gt=0)
+    pose_set: int = Field(gt=0)
 
 
 class OrderInsert(OrderBase):
@@ -32,3 +35,8 @@ class Order(OrderBase):
     @field_serializer('created_at')
     def serialize_datetime(v, _info):
         return v.isoformat(sep='T', timespec='seconds')  # type: ignore
+
+
+class OrderWithData(Order):
+    model: ModelWithImages
+    pose_set: PoseSetWithPoses
