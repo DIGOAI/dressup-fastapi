@@ -28,8 +28,6 @@ def get_orders_with_data(request: Request) -> OrdersWithDataResponse:
         "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*)))"
     ).eq("user_id", user_id).execute()
 
-    print(orders_res.data)
-
     orders = [OrderWithData(**order) for order in orders_res.data]
 
     return {"data": orders, "count": len(orders)}
@@ -38,8 +36,6 @@ def get_orders_with_data(request: Request) -> OrdersWithDataResponse:
 @router.get("/{order_id}")
 def get_order_with_data(request: Request, order_id: int) -> OrderWithDataResponse:
     user_id = request.state.user
-
-    print("Order ID", order_id)
 
     order_res = supabase.table("orders").select(
         "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*)))"
@@ -113,7 +109,7 @@ def complete_order(request: Request, order_id: int, completed_order: OrderComple
     return {"data": order_updated, "count": 1}
 
 
-@router.post("/new", dependencies=[Depends(JWTBearer(min_role=Role.ADMIN))])
+@router.post("/new")
 def create_order(request: Request, img_front: UploadFile, img_back: UploadFile, img_left: UploadFile, img_right: UploadFile, model: int = Form(), pose_set: int = Form(), name: str = Form()) -> OrderResponse:
     user_id = request.state.user
     role = request.state.role
@@ -148,3 +144,9 @@ def create_order(request: Request, img_front: UploadFile, img_back: UploadFile, 
     # In this point launch a endpoint to process the order
 
     return {"data": order_created, "count": 1}
+
+
+@router.post("/new/test")
+def create_order_test(request: Request, test_param: int = Form()):
+    user_id = request.state.user
+    return {"user": user_id, "test_param": test_param}
