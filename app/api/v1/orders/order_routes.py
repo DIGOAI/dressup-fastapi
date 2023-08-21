@@ -114,7 +114,7 @@ def complete_order(request: Request, order_id: int, completed_order: OrderComple
 
 
 @router.post("/new", dependencies=[Depends(JWTBearer(min_role=Role.ADMIN))])
-def create_order(request: Request, img_front: UploadFile, img_back: UploadFile, img_left: UploadFile, img_right: UploadFile, model: int = Form(), pose_set: int = Form()) -> OrderResponse:
+def create_order(request: Request, img_front: UploadFile, img_back: UploadFile, img_left: UploadFile, img_right: UploadFile, model: int = Form(), pose_set: int = Form(), name: str = Form()) -> OrderResponse:
     user_id = request.state.user
     role = request.state.role
 
@@ -131,7 +131,7 @@ def create_order(request: Request, img_front: UploadFile, img_back: UploadFile, 
 
     images_t: list[Image] = [Image(**image) for image in images_res.data]
 
-    order = OrderInsert(model=model, pose_set=pose_set)
+    order = OrderInsert(model=model, pose_set=pose_set, name=name)
 
     order_res = supabase.table("orders").insert(json={
         **order.model_dump(),
