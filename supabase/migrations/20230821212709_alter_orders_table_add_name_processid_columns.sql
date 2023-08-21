@@ -1,0 +1,5 @@
+ALTER TABLE orders
+ADD COLUMN name VARCHAR(255);
+
+ALTER TABLE orders
+ADD COLUMN process_id VARCHAR(100);
