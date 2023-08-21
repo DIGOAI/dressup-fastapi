@@ -6,12 +6,12 @@ from app.repositories import supabase
 from app.schemas import Image
 
 router = APIRouter(
-    prefix="/poses", tags=["poses"], dependencies=[Depends(JWTBearer())])
+    prefix="/poses", tags=["Poses"], dependencies=[Depends(JWTBearer())])
 
 
 @router.get("/")
 def get_poses(request: Request):
-    res = supabase.table("Poses").select("*").execute()
+    res = supabase.table("poses").select("*").execute()
     return {"data": res.data, "count": len(res.data)}
 
 
