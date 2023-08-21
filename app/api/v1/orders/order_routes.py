@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
+from fastapi import (APIRouter, Depends, Form, HTTPException, Request,
+                     UploadFile, status)
 from typing_extensions import TypedDict
 
+from app.common import StorageFolder, upload_images_to_storage
 from app.middlewares import JWTBearer
 from app.repositories import supabase
-from app.schemas import Order, OrderInsert, OrderWithData
+from app.schemas import Image, Order, OrderInsert, OrderWithData
 
 router = APIRouter(
     prefix="/orders", tags=["orders"], dependencies=[Depends(JWTBearer())])
@@ -17,37 +19,37 @@ OrdersWithDataResponse = TypedDict("OrdersWithDataResponse", {
                                    "data": list[OrderWithData], "count": int})
 
 
+# @router.get("/")
+# def get_orders(request: Request) -> OrdersResponse:
+#     user_id = request.state.user
+
+#     orders_res = supabase.table("orders").select(
+#         "*").eq("user_id", user_id).execute()
+
+#     orders = [Order(**order) for order in orders_res.data]
+
+#     return {"data": orders, "count": len(orders)}
+
+
+# @router.get("/{order_id}")
+# def get_order(request: Request, order_id: int) -> OrderResponse:
+#     user_id = request.state.user
+
+#     print("Order ID", order_id)
+
+#     order_res = supabase.table("orders").select(
+#         "*").eq("user_id", user_id).eq("id", order_id).execute()
+
+#     if len(order_res.data) == 0:
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+#                             detail=f"Order {order_id} not found.")
+
+#     order = Order(**order_res.data[0])
+
+#     return {"data": order, "count": 1}
+
+
 @router.get("/")
-def get_orders(request: Request) -> OrdersResponse:
-    user_id = request.state.user
-
-    orders_res = supabase.table("orders").select(
-        "*").eq("user_id", user_id).execute()
-
-    orders = [Order(**order) for order in orders_res.data]
-
-    return {"data": orders, "count": len(orders)}
-
-
-@router.get("/{order_id}")
-def get_order(request: Request, order_id: int) -> OrderResponse:
-    user_id = request.state.user
-
-    print("Order ID", order_id)
-
-    order_res = supabase.table("orders").select(
-        "*").eq("user_id", user_id).eq("id", order_id).execute()
-
-    if len(order_res.data) == 0:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Order {order_id} not found.")
-
-    order = Order(**order_res.data[0])
-
-    return {"data": order, "count": 1}
-
-
-@router.get("/with-data")
 def get_orders_with_data(request: Request) -> OrdersWithDataResponse:
     user_id = request.state.user
 
@@ -62,7 +64,7 @@ def get_orders_with_data(request: Request) -> OrdersWithDataResponse:
     return {"data": orders, "count": len(orders)}
 
 
-@router.get("/{order_id}/with-data")
+@router.get("/{order_id}")
 def get_order_with_data(request: Request, order_id: int) -> OrderWithDataResponse:
     user_id = request.state.user
 
@@ -82,9 +84,24 @@ def get_order_with_data(request: Request, order_id: int) -> OrderWithDataRespons
 
 
 @router.post("/new")
-def create_order(request: Request, order: OrderInsert = Body(...)) -> OrderResponse:
+def create_order(request: Request, img_front: UploadFile, img_back: UploadFile, img_left: UploadFile, img_right: UploadFile, model: int = Form(), pose_set: int = Form()) -> OrderResponse:
     user_id = request.state.user
     role = request.state.role
+
+    inserted_images = [image.model_dump() for image in upload_images_to_storage(
+        [img_front, img_back, img_left, img_right], StorageFolder.INPUTS)]
+
+    inserted_images[0]["metadata"] = {"side": "front"}
+    inserted_images[1]["metadata"] = {"side": "back"}
+    inserted_images[2]["metadata"] = {"side": "left"}
+    inserted_images[3]["metadata"] = {"side": "right"}
+
+    images_res = supabase.table("images").insert(
+        json=inserted_images).execute()
+
+    images_t: list[Image] = [Image(**image) for image in images_res.data]
+
+    order = OrderInsert(model=model, pose_set=pose_set)
 
     order_res = supabase.table("orders").insert(json={
         **order.model_dump(),
@@ -92,5 +109,12 @@ def create_order(request: Request, order: OrderInsert = Body(...)) -> OrderRespo
     }).execute()
 
     order_created = Order(**order_res.data[0])
+
+    order_images_res = supabase.table("order_items").insert(json=[{
+        "order_id": order_created.id,
+        "img": image.id
+    } for image in images_t]).execute()
+
+    # In this point launch a endpoint to process the order
 
     return {"data": order_created, "count": 1}
