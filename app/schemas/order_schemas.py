@@ -15,14 +15,6 @@ class OrderType(str, Enum):
     OUTPUT = 'OUTPUT'
 
 
-class OrderItemStatus(str, Enum):
-    WAITING = 'WAITING'
-    IN_PROCESS = 'IN_PROCESS'
-    COMPLETED = 'COMPLETED'
-    CANCELLED = 'CANCELLED'
-    FAILED = 'FAILED'
-
-
 class OrderStatus(str, Enum):
     WAITING = 'WAITING'
     IN_PROCESS = 'IN_PROCESS'
@@ -39,6 +31,7 @@ class OrderBase(BaseModel):
 class OrderInsert(OrderBase):
     status: Optional[OrderStatus] = Field(default=OrderStatus.WAITING)
     name: Optional[str] = Field(min_length=3, max_length=255)
+    metadata: Optional[Dict[str, Any]] = Field(default={})
 
 
 class OrderUpdateStatus(BaseModel):
@@ -50,7 +43,7 @@ class OrderComplete(BaseModel):
     order_id: int = Field(gt=0)
     metadata: Optional[Dict[str, Any]] = Field(default={})
     images: list[ImageInsert] = Field(...)
-    status: OrderItemStatus = Field(...)
+    status: OrderStatus = Field(...)
 
 
 class Order(OrderBase):
@@ -77,13 +70,9 @@ class OrderItemBase(BaseModel):
 
 
 class OrderItemInsert(OrderItemBase):
-    status: Optional[OrderItemStatus] = Field(default=OrderItemStatus.WAITING)
-    metadata: Optional[Dict[str, Any]] = Field(default={})
     type: Optional[OrderType] = Field(default=OrderType.INPUT)
 
 
 class OrderItem(OrderItemBase):
     item_id: str = Field(pattern=UUIDV4_PATTERN)
-    status: OrderItemStatus = Field(...)
-    metadata: Dict[str, Any] = Field(default={})
     type: OrderType = Field(...)

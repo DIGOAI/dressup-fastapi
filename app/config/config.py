@@ -34,8 +34,10 @@ class Config(metaclass=SingletonMeta):
 
         self.SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
         self.SUPABASE_KEY: str = os.getenv("SUPABASE_KEY", "")
-        self.SUPABASE_BUCKET: str = os.getenv("SUPABASE_BUCKET", "")
+        self.SUPABASE_BUCKET: str = os.getenv(
+            "SUPABASE_BUCKET", "dressupbucket")
         self.X_API_KEY: str = os.getenv("X_API_KEY", "")
+        self.X_API_KEY_NAME: str = os.getenv("X_API_KEY_NAME", "X-API-KEY")
         self.JWT_SECRET = os.getenv("JWT_SECRET", "")
         self.JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
         self.DEBUG = os.getenv("DEBUG", "False") == "True"
