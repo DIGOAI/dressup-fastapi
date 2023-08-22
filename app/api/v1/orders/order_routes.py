@@ -95,7 +95,8 @@ def complete_order(request: Request, order_id: int, completed_order: OrderComple
 
     order_images_res = supabase.table("order_items").insert(json=[{
         "order_id": order_id,
-        "img": image.id
+        "img": image.id,
+        "type": image.type
     } for image in images_t]).execute()
 
     order_res = supabase.table("orders").update(json={
