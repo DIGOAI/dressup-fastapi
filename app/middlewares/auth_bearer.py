@@ -12,6 +12,12 @@ class Role(IntEnum):
     ADMIN = 3
 
 
+class AuthCredentials:
+    def __init__(self, user: str, role: Role) -> None:
+        self.user = user
+        self.role = role
+
+
 class JWTBearer(HTTPBearer):
     def __init__(self, min_role: Role = Role.PUBLIC, auto_error: bool = True):
         super(JWTBearer, self).__init__(auto_error=auto_error)
@@ -34,11 +40,11 @@ class JWTBearer(HTTPBearer):
             request.state.user = payload["sub"]
             request.state.role = payload["role"]
 
-            if not self.verify_role(payload["role"], self.min_role.name):
+            if not Role[payload["role"]] >= self.min_role:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient rights.")
 
-            return {"user": payload["sub"], "role": payload["role"]}
+            return AuthCredentials(payload["sub"], Role[payload["role"]])
         else:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required.")
@@ -50,9 +56,4 @@ class JWTBearer(HTTPBearer):
             return None
 
     def verify_role(self, role: str, min_role: str):
-        rolev = Role[role]
-        min_rolev = Role[min_role]
-
-        print(rolev, min_rolev)
-
         return Role[role] >= Role[min_role]

@@ -3,13 +3,12 @@ from fastapi import (APIRouter, Body, Depends, Form, HTTPException, Request,
 from typing_extensions import TypedDict
 
 from app.common import StorageFolder, upload_images_to_storage
-from app.middlewares import JWTBearer, Role
+from app.middlewares import APITokenAuth, JWTBearer
 from app.repositories import supabase
 from app.schemas import (Image, ImageType, Order, OrderComplete, OrderInsert,
-                         OrderStatus, OrderUpdateStatus, OrderWithData)
+                         OrderUpdateStatus, OrderWithData)
 
-router = APIRouter(
-    prefix="/orders", tags=["Orders"], dependencies=[Depends(JWTBearer())])
+router = APIRouter(prefix="/orders", tags=["Orders"])
 
 OrderResponse = TypedDict("OrderResponse", {"data": Order, "count": int})
 OrdersResponse = TypedDict(
@@ -20,7 +19,7 @@ OrdersWithDataResponse = TypedDict("OrdersWithDataResponse", {
                                    "data": list[OrderWithData], "count": int})
 
 
-@router.get("/")
+@router.get("/", dependencies=[Depends(JWTBearer())])
 def get_orders_with_data(request: Request) -> OrdersWithDataResponse:
     user_id = request.state.user
 
@@ -33,7 +32,7 @@ def get_orders_with_data(request: Request) -> OrdersWithDataResponse:
     return {"data": orders, "count": len(orders)}
 
 
-@router.get("/{order_id}")
+@router.get("/{order_id}", dependencies=[Depends(JWTBearer())])
 def get_order_with_data(request: Request, order_id: int) -> OrderWithDataResponse:
     user_id = request.state.user
 
@@ -50,7 +49,7 @@ def get_order_with_data(request: Request, order_id: int) -> OrderWithDataRespons
     return {"data": order, "count": 1}
 
 
-@router.post("/{order_id}/update-status")
+@router.post("/{order_id}/update-status", dependencies=[Depends(JWTBearer())])
 def update_order_status(request: Request, order_id: int, new_status: OrderUpdateStatus = Body(...)) -> OrderResponse:
     user_id = request.state.user
     role = request.state.role
@@ -77,7 +76,7 @@ def update_order_status(request: Request, order_id: int, new_status: OrderUpdate
     return {"data": order_updated, "count": 1}
 
 
-@router.post("/{order_id}/complete", dependencies=[Depends(JWTBearer(min_role=Role.ADMIN))])
+@router.post("/{order_id}/complete", dependencies=[Depends(APITokenAuth())])
 def complete_order(request: Request, order_id: int, completed_order: OrderComplete = Body(...)) -> OrderResponse:
     order_res = supabase.table("orders").select("*").eq(
         "id", order_id).execute()
@@ -109,7 +108,7 @@ def complete_order(request: Request, order_id: int, completed_order: OrderComple
     return {"data": order_updated, "count": 1}
 
 
-@router.post("/new")
+@router.post("/new", dependencies=[Depends(JWTBearer())])
 def create_order(request: Request, img_front: UploadFile, img_back: UploadFile, img_left: UploadFile, img_right: UploadFile, model: int = Form(), pose_set: int = Form(), name: str = Form()) -> OrderResponse:
     user_id = request.state.user
     role = request.state.role
@@ -144,9 +143,3 @@ def create_order(request: Request, img_front: UploadFile, img_back: UploadFile, 
     # In this point launch a endpoint to process the order
 
     return {"data": order_created, "count": 1}
-
-
-@router.post("/new/test")
-def create_order_test(request: Request, test_param: int = Form()):
-    user_id = request.state.user
-    return {"user": user_id, "test_param": test_param}
