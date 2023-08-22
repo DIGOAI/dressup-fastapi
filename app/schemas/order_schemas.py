@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, field_serializer
 
 from app.schemas.model_schemas import ModelWithImages
 from app.schemas.pose_schemas import PoseSetWithPoses
-from app.schemas.images_schemas import ImageInsert
+from app.schemas.images_schemas import ImageInsert, Image
 from app.utils.patterns import UUIDV4_PATTERN
 
 
@@ -59,11 +59,6 @@ class Order(OrderBase):
         return v.isoformat(sep='T', timespec='seconds')  # type: ignore
 
 
-class OrderWithData(Order):
-    model: ModelWithImages
-    pose_set: PoseSetWithPoses
-
-
 class OrderItemBase(BaseModel):
     order_id: int = Field(gt=0)
     img: int = Field(gt=0)
@@ -76,3 +71,13 @@ class OrderItemInsert(OrderItemBase):
 class OrderItem(OrderItemBase):
     item_id: str = Field(pattern=UUIDV4_PATTERN)
     type: OrderType = Field(...)
+
+
+class OrderItemWithData(OrderItem):
+    img: Image
+
+
+class OrderWithData(Order):
+    model: ModelWithImages
+    pose_set: PoseSetWithPoses
+    items: list[OrderItemWithData]

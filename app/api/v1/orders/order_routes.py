@@ -24,7 +24,7 @@ def get_orders_with_data(request: Request) -> OrdersWithDataResponse:
     user_id = request.state.user
 
     orders_res = supabase.table("orders").select(
-        "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*)))"
+        "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*))),items:order_items(*,img:images(*))"
     ).eq("user_id", user_id).execute()
 
     orders = [OrderWithData(**order) for order in orders_res.data]
@@ -37,7 +37,7 @@ def get_order_with_data(request: Request, order_id: int) -> OrderWithDataRespons
     user_id = request.state.user
 
     order_res = supabase.table("orders").select(
-        "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*)))"
+        "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*))),items:order_items(*,img:images(*))"
     ).eq("user_id", user_id).eq("id", order_id).execute()
 
     if len(order_res.data) == 0:
