@@ -1,4 +1,5 @@
 from datetime import date
+from typing import cast
 
 from fastapi import (APIRouter, Body, Depends, Form, HTTPException, Request,
                      UploadFile, status)
@@ -97,12 +98,12 @@ def get_order_with_data(request: Request, order_id: int) -> OrderWithDataRespons
     return {"data": order, "count": 1}
 
 
-@router.post("/{order_id}/update-status", dependencies=[Depends(JWTBearer())])
+@router.post("/{order_id}/update-status", dependencies=[Depends(APITokenAuth())])
 def update_order_status(request: Request, order_id: int, new_status: OrderUpdateStatus = Body(...)) -> OrderResponse:
     user_id = request.state.user
-    role = request.state.role
+    role = cast(str, request.state.role)
 
-    if role != "admin":
+    if role.lower() != "admin" and role.lower() != "service":
         order_res = supabase.table("orders").select("*").eq(
             "user_id", user_id).eq("id", order_id).execute()
     else:
