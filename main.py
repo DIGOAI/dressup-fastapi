@@ -25,7 +25,8 @@ def load_exception_handlers(app: FastAPI) -> None:
 
 
 def create_app() -> FastAPI:
-    app = FastAPI()
+    app = FastAPI(title="DressUp API - DIGO", version="1.0.0",
+                  description="This is the API for the DressUp project.")
     load_exception_handlers(app)  # Load exception handlers
     app.add_middleware(
         CORSMiddleware,
