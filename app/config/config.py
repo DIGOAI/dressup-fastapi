@@ -41,3 +41,4 @@ class Config(metaclass=SingletonMeta):
         self.JWT_SECRET = os.getenv("JWT_SECRET", "")
         self.JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
         self.DEBUG = os.getenv("DEBUG", "False") == "True"
+        self.ORDER_COST = float(os.getenv("ORDER_COST", "3.50"))

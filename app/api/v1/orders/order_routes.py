@@ -1,12 +1,16 @@
+from datetime import date
+
 from fastapi import (APIRouter, Body, Depends, Form, HTTPException, Request,
                      UploadFile, status)
 from typing_extensions import TypedDict
 
 from app.common import StorageFolder, upload_images_to_storage
+from app.config import Config
 from app.middlewares import APITokenAuth, JWTBearer
 from app.repositories import supabase
 from app.schemas import (Image, ImageType, Order, OrderComplete, OrderInsert,
-                         OrderUpdateStatus, OrderWithData)
+                         OrderResume, OrderStatus, OrderUpdateStatus,
+                         OrderWithData)
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
 
@@ -17,6 +21,12 @@ OrderWithDataResponse = TypedDict("OrderWithDataResponse", {
                                   "data": OrderWithData, "count": int})
 OrdersWithDataResponse = TypedDict("OrdersWithDataResponse", {
                                    "data": list[OrderWithData], "count": int})
+
+OrderResumeValues = TypedDict("OrderResumeValues", {
+                              "total": int, "completed": int, "waiting": int, "in_process": int, "cancelled": int, "cost": float})
+OrdersResumeResponse = TypedDict("OrdersResumeResponse", {
+    "data": OrderResumeValues
+})
 
 
 @router.get("/", dependencies=[Depends(JWTBearer())])
@@ -36,6 +46,38 @@ def get_orders_with_data(request: Request, start: int | None = None, end: int | 
     orders = [OrderWithData(**order) for order in orders_res.data]
 
     return {"data": orders, "count": len(orders)}
+
+
+@router.get("/resume", dependencies=[Depends(JWTBearer())])
+def get_orders_resume(request: Request, start: date | None = None, end: date | None = None) -> OrdersResumeResponse:
+    user_id = request.state.user
+
+    query = supabase.table("orders").select(
+        "id,status,created_at"
+    ).eq("user_id", user_id).neq("status", "FAILED")
+
+    start = start or date.today().replace(day=1)
+    end = end or date.today()
+
+    query = query.gte("created_at", start).lte("created_at", end)
+
+    orders_res = query.execute()
+
+    orders = [OrderResume(**order) for order in orders_res.data]
+
+    total = len(orders)
+    completed = len(
+        [order for order in orders if order.status == OrderStatus.COMPLETED])
+    waiting = len(
+        [order for order in orders if order.status == OrderStatus.WAITING])
+    in_process = len(
+        [order for order in orders if order.status == OrderStatus.IN_PROCESS])
+    cancelled = len(
+        [order for order in orders if order.status == OrderStatus.CANCELLED])
+
+    cost = completed * Config.ORDER_COST
+
+    return {"data": {"total": total, "completed": completed, "waiting": waiting, "in_process": in_process, "cancelled": cancelled, "cost": cost}}
 
 
 @router.get("/{order_id}", dependencies=[Depends(JWTBearer())])
