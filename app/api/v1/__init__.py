@@ -24,7 +24,7 @@ def ping():
 
 
 router.include_router(auth_router, include_in_schema=Config.DEBUG)
-router.include_router(keys_router)
+router.include_router(keys_router, include_in_schema=False)
 router.include_router(order_router)
 router.include_router(model_router)
 router.include_router(pose_router)
