@@ -63,6 +63,8 @@ def get_orders_resume(request: Request, start: date | None = None, end: date | N
 
     orders_res = query.execute()
 
+    print("Orders: ", orders_res.data)
+
     orders = [OrderResume(**order) for order in orders_res.data]
 
     total = len(orders)
