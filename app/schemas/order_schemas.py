@@ -81,3 +81,13 @@ class OrderWithData(Order):
     model: ModelWithImages
     pose_set: PoseSetWithPoses
     items: list[OrderItemWithData]
+
+
+class OrderResume():
+    id: int = Field(gt=0)
+    status: OrderStatus = Field(...)
+    created_at: datetime = Field(...)
+
+    @field_serializer('created_at')
+    def serialize_datetime(v, _info):
+        return v.isoformat(sep='T', timespec='seconds')  # type: ignore
