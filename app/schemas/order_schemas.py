@@ -83,7 +83,7 @@ class OrderWithData(Order):
     items: list[OrderItemWithData]
 
 
-class OrderResume():
+class OrderResume(BaseModel):
     id: int = Field(gt=0)
     status: OrderStatus = Field(...)
     created_at: datetime = Field(...)
