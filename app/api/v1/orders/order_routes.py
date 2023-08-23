@@ -20,12 +20,18 @@ OrdersWithDataResponse = TypedDict("OrdersWithDataResponse", {
 
 
 @router.get("/", dependencies=[Depends(JWTBearer())])
-def get_orders_with_data(request: Request) -> OrdersWithDataResponse:
+def get_orders_with_data(request: Request, start: int | None = None, end: int | None = None) -> OrdersWithDataResponse:
     user_id = request.state.user
 
-    orders_res = supabase.table("orders").select(
+    query = supabase.table("orders").select(
         "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*))),items:order_items(*,img:images(*))"
-    ).eq("user_id", user_id).execute()
+    ).eq("user_id", user_id)
+
+    if start is not None and end is not None:
+        print(f"Start: {start}, End: {end}")
+        query = query.range(start, end)
+
+    orders_res = query.execute()
 
     orders = [OrderWithData(**order) for order in orders_res.data]
 
