@@ -37,8 +37,7 @@ def create_app() -> FastAPI:
     load_exception_handlers(app)  # Load exception handlers
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=ORIGINS,
-        allow_origin_regex=Config.ALLOWED_ORIGINS,
+        allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"]
