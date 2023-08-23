@@ -7,6 +7,8 @@ from fastapi.staticfiles import StaticFiles
 from app.api.v1 import router as api_v1_router
 from app.exeptions import SupabaseException
 
+from app.config import Config
+
 ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8000",
@@ -36,6 +38,7 @@ def create_app() -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=ORIGINS,
+        allow_origin_regex=Config.ALLOWED_ORIGINS,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"]
