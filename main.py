@@ -9,14 +9,10 @@ from app.exeptions import SupabaseException
 
 from app.config import Config
 
-ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:8000",
-    "https://localhost:3000",
-    "https://localhost:8000",
-    "https://*.vercel.app",
-    "https://dressup-frontend-next.vercel.app"
-]
+ORIGINS = Config.ALLOWED_ORIGINS
+
+# Regex for this origins: http://localhost:XXXX, https://localhost:XXXX, https://*.vercel.app
+# origins_pattern = r"^https?:\/\/localhost:\d{4}$|^https?:\/\/.*\.vercel\.app$"
 
 
 def load_exception_handlers(app: FastAPI) -> None:
@@ -29,7 +25,7 @@ def load_exception_handlers(app: FastAPI) -> None:
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="DressUp API - DIGO", version="1.1.0",
+    app = FastAPI(title="DressUp API - DIGO", version="1.1.1",
                   description="This is the API for the DressUp project.", docs_url=None)
 
     app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -37,7 +33,7 @@ def create_app() -> FastAPI:
     load_exception_handlers(app)  # Load exception handlers
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=[ORIGINS],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"]

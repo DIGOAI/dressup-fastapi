@@ -42,4 +42,5 @@ class Config(metaclass=SingletonMeta):
         self.JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
         self.DEBUG = os.getenv("DEBUG", "False") == "True"
         self.ORDER_COST = float(os.getenv("ORDER_COST", "3.50"))
-        self.ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*")
+        self.ALLOWED_ORIGINS = [url.strip() for url in os.getenv(
+            "ALLOWED_ORIGINS", "*").split(",")]
