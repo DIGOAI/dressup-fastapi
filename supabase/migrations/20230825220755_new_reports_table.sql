@@ -8,7 +8,7 @@ CREATE TYPE reportType AS ENUM (
 CREATE TABLE
     reports (
         id BIGSERIAL NOT NULL PRIMARY KEY,
-        user_id UUID NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+        user_id UUID NOT NULL REFERENCES auth.users ON DELETE CASCADE,
         order_id BIGINT NOT NULL REFERENCES orders (id) ON DELETE CASCADE,
         type reportType NULL DEFAULT 'OTHER',
         description TEXT NULL,
