@@ -6,6 +6,7 @@ from app.api.v1.models import model_router
 from app.api.v1.orders import order_router
 from app.api.v1.pose_sets import pose_sets_router
 from app.api.v1.poses import pose_router
+from app.api.v1.reports import report_router
 from app.api.v1.users import user_router
 from app.config import Config
 
@@ -31,3 +32,4 @@ router.include_router(model_router)
 router.include_router(pose_router)
 router.include_router(pose_sets_router)
 router.include_router(user_router)
+router.include_router(report_router)

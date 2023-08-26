@@ -10,3 +10,4 @@ from app.schemas.order_schemas import (Order, OrderComplete, OrderInsert,
 from app.schemas.pose_schemas import (Pose, PoseSet, PoseSetInsert,
                                       PoseSetWithPoses)
 from app.schemas.profile_schemas import Profile
+from app.schemas.reports_schemas import Report, ReportInsert
