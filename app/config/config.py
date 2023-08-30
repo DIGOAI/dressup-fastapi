@@ -44,3 +44,5 @@ class Config(metaclass=SingletonMeta):
         self.ORDER_COST = float(os.getenv("ORDER_COST", "3.50"))
         self.ALLOWED_ORIGINS = [url.strip() for url in os.getenv(
             "ALLOWED_ORIGINS", "*").split(",")]
+        self.DRESSUP_RUNPOD_API_URL = os.getenv("DRESSUP_RUNPOD_API_URL", "")
+        self.DRESSUP_RUNPOD_BEARER_TOKEN = os.getenv("DRESSUP_RUNPOD_BEARER_TOKEN", "")

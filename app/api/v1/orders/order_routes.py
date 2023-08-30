@@ -11,7 +11,10 @@ from app.middlewares import APITokenAuth, JWTBearer
 from app.repositories import supabase
 from app.schemas import (Image, ImageType, Order, OrderComplete, OrderInsert,
                          OrderResume, OrderStatus, OrderUpdateStatus,
-                         OrderWithData)
+                         OrderWithData, OrderResult)
+
+from app.utils.images import base64_to_image
+from app.services.runpod.dressup import dressupService
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
 
@@ -193,3 +196,16 @@ def create_order(request: Request, img_front: UploadFile, img_back: UploadFile, 
     # In this point launch a endpoint to process the order
 
     return {"data": order_created, "count": 1}
+
+
+@router.post("/results")
+def update_order(order: OrderResult):
+    """Updates some order results."""
+    order = order.dict()
+    images = order.get("images", [])
+    images = [base64_to_image(image) for image in images]
+    return "results"
+
+@router.get("/getx")
+def get_order():
+    pass

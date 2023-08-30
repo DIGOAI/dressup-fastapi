@@ -91,3 +91,8 @@ class OrderResume(BaseModel):
     @field_serializer('created_at')
     def serialize_datetime(v, _info):
         return v.isoformat(sep='T', timespec='seconds')  # type: ignore
+
+
+# :pass
+class OrderResult(BaseModel):
+    images: list[str]

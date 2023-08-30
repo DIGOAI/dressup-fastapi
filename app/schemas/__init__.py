@@ -6,7 +6,7 @@ from app.schemas.model_schemas import (Model, ModelInsert, ModelInsertForm,
 from app.schemas.order_schemas import (Order, OrderComplete, OrderInsert,
                                        OrderItem, OrderItemInsert, OrderResume,
                                        OrderStatus, OrderUpdateStatus,
-                                       OrderWithData)
+                                       OrderWithData, OrderResult)
 from app.schemas.pose_schemas import (Pose, PoseSet, PoseSetInsert,
                                       PoseSetWithPoses)
 from app.schemas.profile_schemas import Profile
