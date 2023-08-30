@@ -1,0 +1,1 @@
+from app.api.v1.reports.report_routes import router as report_router
