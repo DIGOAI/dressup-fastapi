@@ -10,12 +10,11 @@ from app.common import StorageFolder, upload_images_to_storage
 from app.config import Config
 from app.middlewares import APITokenAuth, JWTBearer
 from app.repositories import supabase
-from app.schemas import (Image, ImageType, Order, OrderCompleteRaw, OrderInsert,
-                         OrderResume, OrderStatus, OrderUpdateStatus,
-                         OrderWithData, OrderResult)
-
-from app.utils.images import base64_to_image
+from app.schemas import (Image, ImageType, Order, OrderCompleteRaw,
+                         OrderInsert, OrderResult, OrderResume, OrderStatus,
+                         OrderUpdateStatus, OrderWithData)
 from app.services.runpod.dressup import dressupService
+from app.utils.images import base64_to_image
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
 
@@ -92,6 +91,21 @@ def get_order_with_data(request: Request, order_id: int) -> OrderWithDataRespons
     order_res = supabase.table("orders").select(
         "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*))),items:order_items(*,img:images(*))"
     ).eq("user_id", user_id).eq("id", order_id).execute()
+
+    if len(order_res.data) == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Order {order_id} not found.")
+
+    order = OrderWithData(**order_res.data[0])
+
+    return {"data": order, "count": 1}
+
+
+@router.get("/{order_id}/service", dependencies=[Depends(APITokenAuth())])
+def get_order_with_data_service(request: Request, order_id: int) -> OrderWithDataResponse:
+    order_res = supabase.table("orders").select(
+        "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*))),items:order_items(*,img:images(*))"
+    ).eq("id", order_id).execute()
 
     if len(order_res.data) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
