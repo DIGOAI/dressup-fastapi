@@ -1,4 +1,5 @@
 from datetime import date
+from io import BytesIO
 from typing import cast
 
 from fastapi import (APIRouter, Body, Depends, Form, HTTPException, Request,
@@ -9,7 +10,7 @@ from app.common import StorageFolder, upload_images_to_storage
 from app.config import Config
 from app.middlewares import APITokenAuth, JWTBearer
 from app.repositories import supabase
-from app.schemas import (Image, ImageType, Order, OrderComplete, OrderInsert,
+from app.schemas import (Image, ImageType, Order, OrderCompleteRaw, OrderInsert,
                          OrderResume, OrderStatus, OrderUpdateStatus,
                          OrderWithData, OrderResult)
 
@@ -129,7 +130,7 @@ def update_order_status(request: Request, order_id: int, new_status: OrderUpdate
 
 
 @router.post("/{order_id}/complete", dependencies=[Depends(APITokenAuth())])
-def complete_order(request: Request, order_id: int, completed_order: OrderComplete = Body(...)) -> OrderResponse:
+def complete_order(request: Request, order_id: int, completed_order: OrderCompleteRaw = Body(...)) -> OrderResponse:
     order_res = supabase.table("orders").select("*").eq(
         "id", order_id).execute()
 
@@ -137,6 +138,11 @@ def complete_order(request: Request, order_id: int, completed_order: OrderComple
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Order {order_id} not found.")
 
+    images = [UploadFile(BytesIO(image.encode())) for image in completed_order.images]
+
+    print(images)
+
+    return {"data": {}, "count": 1} # type: ignore
     for image in completed_order.images:
         image.type = ImageType.OUTPUT
 
@@ -198,14 +204,14 @@ def create_order(request: Request, img_front: UploadFile, img_back: UploadFile, 
     return {"data": order_created, "count": 1}
 
 
-@router.post("/results")
-def update_order(order: OrderResult):
-    """Updates some order results."""
-    order = order.dict()
-    images = order.get("images", [])
-    images = [base64_to_image(image) for image in images]
-    return "results"
+# @router.post("/results")
+# def update_order(order: OrderResult):
+#     """Updates some order results."""
+#     order = order.model_dump()
+#     images = order.get("images", [])
+#     images = [base64_to_image(image) for image in images]
+#     return "results"
 
-@router.get("/getx")
-def get_order():
-    pass
+# @router.get("/getx")
+# def get_order():
+#     pass
