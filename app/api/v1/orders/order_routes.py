@@ -13,7 +13,7 @@ from app.repositories import supabase
 from app.schemas import (Image, Order, OrderCompleteRaw, OrderInsert,
                          OrderResume, OrderStatus, OrderUpdateStatus,
                          OrderWithData)
-from app.services.runpod.dressup import dressupService
+from app.services import dressupService
 from app.utils.images import base64_to_image
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
@@ -210,6 +210,15 @@ def create_order(request: Request, img_front: UploadFile, img_back: UploadFile, 
         "img": image.id
     } for image in images_t]).execute()
 
-    # In this point launch a endpoint to process the order
+    # Retrieve order created with images
+    order_res = supabase.table("orders").select(
+        "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*))),items:order_items(*,img:images(*))"
+    ).eq("id", order_created.id).execute()
+
+    order_created_with_data = OrderWithData(**order_res.data[0])
+
+    runpod_res = dressupService.wakeup(order_created_with_data)
+
+    print("Runpod Response:", runpod_res)
 
     return {"data": order_created, "count": 1}
