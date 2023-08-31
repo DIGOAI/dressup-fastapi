@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from typing import Any, cast
 
 from fastapi import (APIRouter, Body, Depends, Form, HTTPException, Request,
@@ -61,11 +61,9 @@ def get_orders_resume(request: Request, start: date | None = None, end: date | N
     ).eq("user_id", user_id).neq("status", "FAILED")
 
     start = start or date.today().replace(day=1)
-    end = end or date.today()
+    end = end or date.today() + timedelta(days=1)
 
     print(f"Start: {start}, End: {end}")
-
-    query = query.gte("created_at", start).lte("created_at", end)
 
     orders_res = query.execute()
 
