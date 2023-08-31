@@ -219,6 +219,10 @@ def create_order(request: Request, img_front: UploadFile, img_back: UploadFile, 
 
     runpod_res = dressupService.wakeup(order_created_with_data)
 
-    print("Runpod Response:", runpod_res)
+    if runpod_res:
+        print("Runpod Response:", runpod_res)
+        supabase.table("orders").update(json={
+            "process_id": runpod_res.id
+        }).eq("id", order_created.id).execute()
 
     return {"data": order_created, "count": 1}
