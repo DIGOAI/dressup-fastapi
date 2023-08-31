@@ -63,6 +63,8 @@ def get_orders_resume(request: Request, start: date | None = None, end: date | N
     start = start or date.today().replace(day=1)
     end = end or date.today()
 
+    print(f"Start: {start}, End: {end}")
+
     query = query.gte("created_at", start).lte("created_at", end)
 
     orders_res = query.execute()
