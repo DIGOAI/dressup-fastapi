@@ -25,7 +25,7 @@ def load_exception_handlers(app: FastAPI) -> None:
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="DressUp API - DIGO", version="1.4.0",
+    app = FastAPI(title="DressUp API - DIGO", version="1.5.0",
                   description="This is the API for the DressUp project.", docs_url=None)
 
     app.mount("/static", StaticFiles(directory="static"), name="static")

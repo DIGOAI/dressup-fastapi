@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, Optional
 
-from pydantic import Base64Str, BaseModel, Field, field_serializer
+from pydantic import BaseModel, Field, field_serializer
 
 from app.schemas.images_schemas import Image, ImageInsert
 from app.schemas.model_schemas import ModelWithImages
@@ -36,7 +36,7 @@ class OrderInsert(OrderBase):
 
 class OrderUpdateStatus(BaseModel):
     status: OrderStatus = Field(default=OrderStatus.COMPLETED)
-    process_id: Optional[str] = Field(max_length=100)
+    process_id: Optional[str] = Field(max_length=100, default=None)
 
 
 class OrderComplete(BaseModel):
@@ -49,7 +49,7 @@ class OrderComplete(BaseModel):
 class OrderCompleteRaw(BaseModel):
     order_id: int = Field(gt=0)
     metadata: Optional[Dict[str, Any]] = Field(default={})
-    images: list[Base64Str] = Field(...)
+    images: list[str] = Field(...)
     status: OrderStatus = Field(...)
 
 
@@ -98,8 +98,3 @@ class OrderResume(BaseModel):
     @field_serializer('created_at')
     def serialize_datetime(v, _info):
         return v.isoformat(sep='T', timespec='seconds')  # type: ignore
-
-
-# :pass
-class OrderResult(BaseModel):
-    images: list[str]

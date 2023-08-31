@@ -91,7 +91,7 @@ def base64_to_image(base64_string: str) -> Image.Image:
     """Returns a PIL image as a base64 encoded string."""
 
     if ";base64," in base64_string:
-        split = base64_string.split(";base64")
+        split = base64_string.split(";base64,")
         # mime_type = split[0]
         base64_string = split[1]
 

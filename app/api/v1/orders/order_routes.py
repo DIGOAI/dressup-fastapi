@@ -1,19 +1,19 @@
 from datetime import date
-from io import BytesIO
 from typing import cast
 
 from fastapi import (APIRouter, Body, Depends, Form, HTTPException, Request,
                      UploadFile, status)
 from typing_extensions import TypedDict
 
-from app.common import StorageFolder, upload_images_to_storage
+from app.common import (StorageFolder, upload_images_to_storage,
+                        upload_images_to_storage_pil)
 from app.config import Config
 from app.middlewares import APITokenAuth, JWTBearer
 from app.repositories import supabase
-from app.schemas import (Image, ImageType, Order, OrderCompleteRaw,
-                         OrderInsert, OrderResult, OrderResume, OrderStatus,
-                         OrderUpdateStatus, OrderWithData)
-from app.services.runpod.dressup import dressupService
+from app.schemas import (Image, Order, OrderCompleteRaw, OrderInsert,
+                         OrderResume, OrderStatus, OrderUpdateStatus,
+                         OrderWithData)
+from app.services import dressupService
 from app.utils.images import base64_to_image
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
@@ -152,16 +152,13 @@ def complete_order(request: Request, order_id: int, completed_order: OrderComple
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Order {order_id} not found.")
 
-    images = [UploadFile(BytesIO(image.encode())) for image in completed_order.images]
+    images = [base64_to_image(image) for image in completed_order.images]
 
-    print(images)
-
-    return {"data": {}, "count": 1} # type: ignore
-    for image in completed_order.images:
-        image.type = ImageType.OUTPUT
+    inserted_images = [image.model_dump() for image in upload_images_to_storage_pil(
+        images, StorageFolder.OUTPUTS)]
 
     images_res = supabase.table("images").insert(
-        json=[image.model_dump() for image in completed_order.images]).execute()
+        json=inserted_images).execute()
 
     images_t: list[Image] = [Image(**image) for image in images_res.data]
 
@@ -213,19 +210,15 @@ def create_order(request: Request, img_front: UploadFile, img_back: UploadFile, 
         "img": image.id
     } for image in images_t]).execute()
 
-    # In this point launch a endpoint to process the order
+    # Retrieve order created with images
+    order_res = supabase.table("orders").select(
+        "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*))),items:order_items(*,img:images(*))"
+    ).eq("id", order_created.id).execute()
+
+    order_created_with_data = OrderWithData(**order_res.data[0])
+
+    runpod_res = dressupService.wakeup(order_created_with_data)
+
+    print("Runpod Response:", runpod_res)
 
     return {"data": order_created, "count": 1}
-
-
-# @router.post("/results")
-# def update_order(order: OrderResult):
-#     """Updates some order results."""
-#     order = order.model_dump()
-#     images = order.get("images", [])
-#     images = [base64_to_image(image) for image in images]
-#     return "results"
-
-# @router.get("/getx")
-# def get_order():
-#     pass
