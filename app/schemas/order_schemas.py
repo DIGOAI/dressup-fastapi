@@ -37,6 +37,7 @@ class OrderInsert(OrderBase):
 class OrderUpdateStatus(BaseModel):
     status: OrderStatus = Field(default=OrderStatus.COMPLETED)
     process_id: Optional[str] = Field(max_length=100, default=None)
+    metadata: Optional[Dict[str, Any]] = Field(default=None)
 
 
 class OrderComplete(BaseModel):

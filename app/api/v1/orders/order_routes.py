@@ -1,5 +1,5 @@
 from datetime import date
-from typing import cast
+from typing import Any, cast
 
 from fastapi import (APIRouter, Body, Depends, Form, HTTPException, Request,
                      UploadFile, status)
@@ -134,9 +134,15 @@ def update_order_status(request: Request, order_id: int, new_status: OrderUpdate
 
     order = Order(**order_res.data[0])
 
-    order_res = supabase.table("orders").update(json={
-        "status": new_status.status
-    }).eq("id", order.id).execute()
+    new_data: dict[str, Any] = {
+        "status": new_status.status,
+    }
+
+    if new_status.metadata:
+        new_data["metadata"] = new_status.metadata
+
+    order_res = supabase.table("orders").update(
+        json=new_data).eq("id", order.id).execute()
 
     order_updated = Order(**order_res.data[0])
 
