@@ -4,9 +4,9 @@ from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Field, field_serializer
 
+from app.schemas.images_schemas import Image, ImageInsert
 from app.schemas.model_schemas import ModelWithImages
 from app.schemas.pose_schemas import PoseSetWithPoses
-from app.schemas.images_schemas import ImageInsert, Image
 from app.utils.patterns import UUIDV4_PATTERN
 
 
@@ -36,13 +36,21 @@ class OrderInsert(OrderBase):
 
 class OrderUpdateStatus(BaseModel):
     status: OrderStatus = Field(default=OrderStatus.COMPLETED)
-    process_id: Optional[str] = Field(max_length=100)
+    process_id: Optional[str] = Field(max_length=100, default=None)
+    metadata: Optional[Dict[str, Any]] = Field(default=None)
 
 
 class OrderComplete(BaseModel):
     order_id: int = Field(gt=0)
     metadata: Optional[Dict[str, Any]] = Field(default={})
     images: list[ImageInsert] = Field(...)
+    status: OrderStatus = Field(...)
+
+
+class OrderCompleteRaw(BaseModel):
+    order_id: int = Field(gt=0)
+    metadata: Optional[Dict[str, Any]] = Field(default={})
+    images: list[str] = Field(...)
     status: OrderStatus = Field(...)
 
 
