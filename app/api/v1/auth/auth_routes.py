@@ -7,7 +7,7 @@ from typing_extensions import TypedDict
 from app.exeptions import AuthApiError, SupabaseException
 from app.middlewares import signJWT
 from app.repositories import supabase
-from app.schemas import LoginSchema, Profile, RegisterSchema
+from app.schemas import LoginSchema, Profile, RegisterSchema, UserStatus
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -31,6 +31,10 @@ def login(signin: LoginSchema = Body(...)) -> LoginResponse:
         if user is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+        if user.status == UserStatus.INACTIVE:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="User is inactive")
 
         role = user.role
 
