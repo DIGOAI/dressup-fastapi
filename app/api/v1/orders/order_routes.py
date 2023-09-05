@@ -36,10 +36,16 @@ OrdersResumeResponse = TypedDict("OrdersResumeResponse", {
 @router.get("/", dependencies=[Depends(JWTBearer())])
 def get_orders_with_data(request: Request, start: int | None = None, end: int | None = None) -> OrdersWithDataResponse:
     user_id = request.state.user
+    role = cast(str, request.state.role)
 
-    query = supabase.table("orders").select(
-        "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*))),items:order_items(*,img:images(*))"
-    ).eq("user_id", user_id)
+    if role.lower() != "admin" or role.lower() != "service":
+        query = supabase.table("orders").select(
+            "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*))),items:order_items(*,img:images(*))"
+        )
+    else:
+        query = supabase.table("orders").select(
+            "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*))),items:order_items(*,img:images(*))"
+        ).eq("user_id", user_id)
 
     if start is not None and end is not None:
         print(f"Start: {start}, End: {end}")
@@ -87,10 +93,16 @@ def get_orders_resume(request: Request, start: date | None = None, end: date | N
 @router.get("/{order_id}", dependencies=[Depends(JWTBearer())])
 def get_order_with_data(request: Request, order_id: int) -> OrderWithDataResponse:
     user_id = request.state.user
+    role = cast(str, request.state.role)
 
-    order_res = supabase.table("orders").select(
-        "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*))),items:order_items(*,img:images(*))"
-    ).eq("user_id", user_id).eq("id", order_id).execute()
+    if role.lower() != "admin" or role.lower() != "service":
+        order_res = supabase.table("orders").select(
+            "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*))),items:order_items(*,img:images(*))"
+        ).eq("id", order_id).execute()
+    else:
+        order_res = supabase.table("orders").select(
+            "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*))),items:order_items(*,img:images(*))"
+        ).eq("user_id", user_id).eq("id", order_id).execute()
 
     if len(order_res.data) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
