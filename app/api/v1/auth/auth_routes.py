@@ -46,7 +46,10 @@ def login(signin: LoginSchema = Body(...)) -> LoginResponse:
 
         return {"user": user_id, "access_token_supabase": access_token_supabase, "access_token_dressup": access_token}
     except Exception as e:
-        raise SupabaseException(cast(AuthApiError, e))
+        if isinstance(e, AuthApiError):
+            raise SupabaseException(cast(AuthApiError, e))
+        else:
+            raise e
 
 
 @router.post("/register")
