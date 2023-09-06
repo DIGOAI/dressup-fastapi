@@ -38,7 +38,7 @@ def get_orders_with_data(request: Request, start: int | None = None, end: int | 
     user_id = request.state.user
     role = cast(str, request.state.role)
 
-    if role.lower() != "admin" or role.lower() != "service":
+    if role.lower() == "admin" or role.lower() == "service":
         query = supabase.table("orders").select(
             "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*))),items:order_items(*,img:images(*))"
         )
@@ -95,7 +95,7 @@ def get_order_with_data(request: Request, order_id: int) -> OrderWithDataRespons
     user_id = request.state.user
     role = cast(str, request.state.role)
 
-    if role.lower() != "admin" or role.lower() != "service":
+    if role.lower() == "admin" or role.lower() == "service":
         order_res = supabase.table("orders").select(
             "*,model:models(*,images(*)),pose_set:pose_sets(*,poses(*,cover_image:images!poses_image_fkey(*),skeleton_image:images!poses_skeleton_image_fkey(*))),items:order_items(*,img:images(*))"
         ).eq("id", order_id).execute()
